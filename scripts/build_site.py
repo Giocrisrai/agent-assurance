@@ -63,8 +63,8 @@ PLANTILLA = """<!doctype html>
     <p>This page is generated on every push by running the offline demo scan
     (<code>agent-assurance demo</code>) against a <strong>recorded, deliberately vulnerable demo agent</strong>.
     It contains no client data.</p>
-    <p>The report below is exactly what the tool outputs. The tool was built auditing Spanish-speaking
-    agents, so the probes and the report are in Spanish.</p>
+    <p>The report below is exactly what the tool outputs. It is in English by default;
+    Spanish is available with <code>agent-assurance demo --lang es</code>.</p>
     <p><a href="https://github.com/Giocrisrai/agent-assurance">Source on GitHub</a> ·
     <a href="https://pypi.org/project/agent-assurance/">PyPI</a> ·
     <code>pip install agent-assurance</code></p>
@@ -84,8 +84,8 @@ PLANTILLA = """<!doctype html>
 
 def construir(destino: Path) -> Path:
     """Escribe `index.html` en `destino` y devuelve su ruta."""
-    evaluacion = scan(build_transport(), target_label="Agente demo (grabado)")
-    cuerpo = markdown.markdown(render_markdown(evaluacion), extensions=["tables", "fenced_code"])
+    evaluacion = scan(build_transport("en"), target_label="Demo agent (recorded)", lang="en")
+    cuerpo = markdown.markdown(render_markdown(evaluacion, lang="en"), extensions=["tables", "fenced_code"])
     cuerpo = cuerpo.replace("<table>", '<div class="tabla"><table>').replace("</table>", "</table></div>")
     destino.mkdir(parents=True, exist_ok=True)
     salida = destino / "index.html"

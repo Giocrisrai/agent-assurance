@@ -9,20 +9,27 @@ from __future__ import annotations
 from dataclasses import dataclass, field
 from enum import Enum
 
+from agent_assurance.i18n import DEFAULT_LANG, check_lang
+
 
 class Severity(Enum):
     """Severidad de un hallazgo, ordenable de menor a mayor."""
 
-    INFO = (0, "Informativa")
-    LOW = (1, "Baja")
-    MEDIUM = (2, "Media")
-    MEDIUM_HIGH = (3, "Media-Alta")
-    HIGH = (4, "Alta")
-    CRITICAL = (5, "Critica")
+    INFO = (0, "Informativa", "Informational")
+    LOW = (1, "Baja", "Low")
+    MEDIUM = (2, "Media", "Medium")
+    MEDIUM_HIGH = (3, "Media-Alta", "Medium-High")
+    HIGH = (4, "Alta", "High")
+    CRITICAL = (5, "Critica", "Critical")
 
-    def __init__(self, rank: int, etiqueta: str) -> None:
+    def __init__(self, rank: int, etiqueta: str, label_en: str) -> None:
         self.rank = rank
-        self.etiqueta = etiqueta
+        self.etiqueta = etiqueta  # etiqueta en espanol (compatibilidad)
+        self.label_en = label_en
+
+    def label(self, lang: str = DEFAULT_LANG) -> str:
+        """Etiqueta de la severidad en el idioma pedido ("en" | "es")."""
+        return self.label_en if check_lang(lang) == "en" else self.etiqueta
 
     def __lt__(self, other: "Severity") -> bool:
         if not isinstance(other, Severity):
@@ -47,11 +54,17 @@ class Owasp(Enum):
     LLM08 = ("LLM08", "Vector and Embedding Weaknesses")
     LLM09 = ("LLM09", "Misinformation")
     LLM10 = ("LLM10", "Unbounded Consumption")
-    CONFIG = ("CONFIG", "Configuracion insegura de despliegue")
+    CONFIG = ("CONFIG", "Configuracion insegura de despliegue", "Insecure Deployment Configuration")
 
-    def __init__(self, codigo: str, nombre: str) -> None:
+    def __init__(self, codigo: str, nombre: str, nombre_en: str | None = None) -> None:
         self.codigo = codigo
-        self.nombre = nombre
+        self.nombre = nombre  # nombre en espanol (los LLM01..LLM10 usan el nombre oficial)
+        self.nombre_en = nombre_en or nombre
+
+    def label(self, lang: str = DEFAULT_LANG) -> str:
+        """Codigo + nombre de la categoria en el idioma pedido ("en" | "es")."""
+        nombre = self.nombre_en if check_lang(lang) == "en" else self.nombre
+        return f"{self.codigo} {nombre}"
 
     def __str__(self) -> str:
         return f"{self.codigo} {self.nombre}"

@@ -16,5 +16,5 @@ __all__ = ["build_transport"]
 
 
 if __name__ == "__main__":
-    assessment = scan(build_transport(), target_label="Agente demo (grabado)")
+    assessment = scan(build_transport(), target_label="Demo agent (recorded)")
     print(render_markdown(assessment))

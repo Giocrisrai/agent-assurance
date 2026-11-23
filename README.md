@@ -49,13 +49,18 @@ Each probe produces `Finding`s with severity, impact, fix and **reproducible evi
 ## Usage
 
 ```bash
+# Version 0.2.0 (English by default) is not on PyPI yet; until it is, install it from GitHub:
+#   pip install git+https://github.com/Giocrisrai/agent-assurance.git
 pip install agent-assurance
 
 # See the methodology end to end against a recorded demo agent (no network):
-agent-assurance demo
+agent-assurance demo            # add --lang es for the Spanish report
 
 # Audit a real chat endpoint (POST JSON {"message": "..."}):
 agent-assurance scan https://your-service/api/chat --field message
+
+# Audit a Spanish-speaking agent (Spanish probes and report):
+agent-assurance scan https://your-service/api/chat --field mensaje --lang es
 ```
 
 As a library:
@@ -68,14 +73,14 @@ transport = HttpTransport(
     body_builder=lambda msg: {"message": msg},
     extract=lambda data: data.get("reply", ""),
 )
-assessment = scan(transport, target_label="HR agent v2")
-print(render_markdown(assessment))          # Markdown report, ready for the client
-print("Max severity:", assessment.max_severity.etiqueta)
+assessment = scan(transport, target_label="HR agent v2", lang="en")  # "en" (default) or "es"
+print(render_markdown(assessment, lang="en"))        # Markdown report, ready for the client
+print("Max severity:", assessment.max_severity.label("en"))
 ```
 
 In CI, `agent-assurance scan` exits with code `2` when any finding is High or Critical. Use it as a gate before promoting an agent to production.
 
-> **Language note.** The methodology was built auditing Spanish-speaking agents, so the probe prompts and the generated report are currently in Spanish. English prompts and reports are not available yet.
+> **Language note.** Reports, probe prompts and the recorded demo agent are in English by default. Pass `--lang es` (CLI) or `lang="es"` (library) for Spanish. Probes talk to the target in the chosen language and look for response markers in that language, so set it to the language the target agent speaks.
 
 ## Design
 

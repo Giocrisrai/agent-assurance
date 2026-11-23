@@ -4,8 +4,8 @@ build-backend = "hatchling.build"
 
 [project]
 name = "agent-assurance"
-version = "0.1.0"
-description = "Metodologia y arnes de pruebas para evaluar la seguridad de agentes y aplicaciones LLM en produccion (OWASP LLM Top 10 / NIST AI RMF)."
+version = "0.2.0"
+description = "Methodology and test harness for assessing the security of LLM agents and applications in production (OWASP LLM Top 10 / NIST AI RMF)."
 readme = "README.md"
 requires-python = ">=3.11"
 license = { text = "Apache-2.0" }

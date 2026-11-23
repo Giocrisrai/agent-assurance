@@ -16,7 +16,7 @@ from agent_assurance.report import render_markdown
 from agent_assurance.scanner import scan
 from agent_assurance.transport import HttpTransport, RecordedTransport
 
-__version__ = "0.1.0"
+__version__ = "0.2.0"
 
 __all__ = [
     "Assessment",

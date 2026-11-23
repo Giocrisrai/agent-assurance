@@ -48,13 +48,17 @@ Cada sonda produce `Finding`s con severidad, impacto, corrección y **evidencia 
 ## Uso
 
 ```bash
+# La versión 0.2.0 (inglés por defecto, --lang) aún no está en PyPI; mientras tanto instálala desde GitHub:
+#   pip install git+https://github.com/Giocrisrai/agent-assurance.git
 pip install agent-assurance
 
 # Ver la metodología de punta a punta con un agente demo grabado (sin red):
-agent-assurance demo
+agent-assurance demo --lang es
 
 # Auditar un endpoint de chat real (POST JSON {"mensaje": "..."}):
-agent-assurance scan https://tu-servicio/api/chat --field mensaje
+agent-assurance scan https://tu-servicio/api/chat --field mensaje --lang es
+
+# Sin --lang el idioma por defecto es inglés (informe, sondas y agente demo).
 ```
 
 Como librería:
@@ -67,12 +71,14 @@ transport = HttpTransport(
     body_builder=lambda msg: {"mensaje": msg},
     extract=lambda data: data.get("respuesta", ""),
 )
-assessment = scan(transport, target_label="Agente RRHH v2")
-print(render_markdown(assessment))          # informe Markdown listo para el cliente
-print("Severidad máxima:", assessment.max_severity.etiqueta)
+assessment = scan(transport, target_label="Agente RRHH v2", lang="es")  # "en" (por defecto) o "es"
+print(render_markdown(assessment, lang="es"))         # informe Markdown listo para el cliente
+print("Severidad máxima:", assessment.max_severity.label("es"))
 ```
 
 En CI, `agent-assurance scan` devuelve código de salida `2` si hay algún hallazgo Alto o Crítico — úsalo como gate antes de promover un agente a producción.
+
+> **Nota de idioma.** Por defecto los informes, los prompts de las sondas y el agente demo grabado están en inglés. Usa `--lang es` (CLI) o `lang="es"` (librería) para obtener todo en español. Las sondas hablan con el objetivo en el idioma elegido y buscan marcadores de respuesta en ese idioma, así que debe coincidir con el idioma en que habla el agente evaluado.
 
 ## Diseño
 

@@ -4,6 +4,7 @@ from __future__ import annotations
 
 from typing import Protocol, runtime_checkable
 
+from agent_assurance.i18n import DEFAULT_LANG, check_lang
 from agent_assurance.model import ProbeResult
 
 
@@ -31,6 +32,10 @@ class Probe:
     name: str = "probe"
     #: una linea de que evalua
     description: str = ""
+
+    def __init__(self, lang: str = DEFAULT_LANG) -> None:
+        #: idioma de los prompts, marcadores y textos de hallazgos ("en" | "es")
+        self.lang = check_lang(lang)
 
     def run(self, transport: Transport) -> ProbeResult:  # pragma: no cover
         raise NotImplementedError

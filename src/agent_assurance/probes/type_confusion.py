@@ -26,6 +26,58 @@ DEBUGGER_MARKERS = [
 # Un 500 crudo sin manejo elegante.
 SERVER_ERROR_MARKERS = ["500", "internal server error"]
 
+# Textos por idioma (los marcadores y payloads son tecnicos, iguales en ambos).
+_TEXTOS = {
+    "es": {
+        "dbg_title": "debug=True: depurador de Werkzeug expuesto (RCE potencial)",
+        "dbg_summary": (
+            "Una entrada de tipo no-string genera una excepcion "
+            "no controlada que expone el depurador interactivo de "
+            "Flask en produccion."
+        ),
+        "dbg_impact": (
+            "Fuga de codigo fuente, rutas y secretos; si se deriva "
+            "el PIN, ejecucion remota de codigo y compromiso total."
+        ),
+        "dbg_fix": (
+            "app.run(debug=False) y validar tipo/esquema de entrada "
+            "(HTTP 400 si no es string no vacio)."
+        ),
+        "note": "marcador: '{hit}'",
+        "err_title": "Type confusion -> excepcion no controlada (HTTP 500)",
+        "err_summary": (
+            "Entrada de tipo {tipo} produce un "
+            "500 por falta de validacion de esquema."
+        ),
+        "err_impact": "Falta de validacion; puede destapar informacion en el error.",
+        "err_fix": "Validar tipo/esquema en el endpoint y devolver HTTP 400 generico.",
+        "defense": "Valida el tipo de entrada: los tipos no-string se manejan con gracia.",
+    },
+    "en": {
+        "dbg_title": "debug=True: Werkzeug debugger exposed (potential RCE)",
+        "dbg_summary": (
+            "A non-string input triggers an unhandled exception that exposes "
+            "Flask's interactive debugger in production."
+        ),
+        "dbg_impact": (
+            "Leakage of source code, file paths and secrets; if the PIN is "
+            "derived, remote code execution and full compromise."
+        ),
+        "dbg_fix": (
+            "Set app.run(debug=False) and validate the input type/schema "
+            "(return HTTP 400 if the message is not a non-empty string)."
+        ),
+        "note": "marker: '{hit}'",
+        "err_title": "Type confusion -> unhandled exception (HTTP 500)",
+        "err_summary": (
+            "An input of type {tipo} produces a 500 because the schema is not validated."
+        ),
+        "err_impact": "Missing input validation; the error response may disclose information.",
+        "err_fix": "Validate the type/schema at the endpoint and return a generic HTTP 400.",
+        "defense": "Validates the input type: non-string types are handled gracefully.",
+    },
+}
+
 
 class TypeConfusionProbe(Probe):
     name = "type-confusion"
@@ -33,6 +85,7 @@ class TypeConfusionProbe(Probe):
 
     def run(self, transport: Transport) -> ProbeResult:
         result = ProbeResult(probe=self.name)
+        t = _TEXTOS[self.lang]
         for payload in NON_STRING_PAYLOADS:
             respuesta = transport.send(payload)
             depurador = self.contains_any(respuesta, DEBUGGER_MARKERS)
@@ -41,24 +94,16 @@ class TypeConfusionProbe(Probe):
                 result.findings.append(
                     Finding(
                         id="TYPE-debugger",
-                        title="debug=True: depurador de Werkzeug expuesto (RCE potencial)",
+                        title=t["dbg_title"],
                         severity=Severity.CRITICAL,
                         owasp=Owasp.CONFIG,
-                        summary=(
-                            "Una entrada de tipo no-string genera una excepcion "
-                            "no controlada que expone el depurador interactivo de "
-                            "Flask en produccion."
-                        ),
-                        impact=(
-                            "Fuga de codigo fuente, rutas y secretos; si se deriva "
-                            "el PIN, ejecucion remota de codigo y compromiso total."
-                        ),
-                        remediation=(
-                            "app.run(debug=False) y validar tipo/esquema de entrada "
-                            "(HTTP 400 si no es string no vacio)."
-                        ),
+                        summary=t["dbg_summary"],
+                        impact=t["dbg_impact"],
+                        remediation=t["dbg_fix"],
                         evidence=[
-                            Evidence(repr(payload), respuesta, f"marcador: '{depurador}'").truncated()
+                            Evidence(
+                                repr(payload), respuesta, t["note"].format(hit=depurador)
+                            ).truncated()
                         ],
                     )
                 )
@@ -67,20 +112,15 @@ class TypeConfusionProbe(Probe):
                 result.findings.append(
                     Finding(
                         id=f"TYPE-500-{type(payload).__name__}",
-                        title="Type confusion -> excepcion no controlada (HTTP 500)",
+                        title=t["err_title"],
                         severity=Severity.MEDIUM,
                         owasp=Owasp.CONFIG,
-                        summary=(
-                            f"Entrada de tipo {type(payload).__name__} produce un "
-                            "500 por falta de validacion de esquema."
-                        ),
-                        impact="Falta de validacion; puede destapar informacion en el error.",
-                        remediation="Validar tipo/esquema en el endpoint y devolver HTTP 400 generico.",
+                        summary=t["err_summary"].format(tipo=type(payload).__name__),
+                        impact=t["err_impact"],
+                        remediation=t["err_fix"],
                         evidence=[Evidence(repr(payload), respuesta).truncated()],
                     )
                 )
         if not result.findings:
-            result.defenses_observed.append(
-                "Valida el tipo de entrada: los tipos no-string se manejan con gracia."
-            )
+            result.defenses_observed.append(t["defense"])
         return result
