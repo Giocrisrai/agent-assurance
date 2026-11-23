@@ -9,6 +9,8 @@
 [![Python 3.11+](https://img.shields.io/badge/python-3.11%2B-blue.svg)](https://www.python.org/)
 [![License: Apache-2.0](https://img.shields.io/badge/license-Apache--2.0-green.svg)](LICENSE)
 
+**[▶ See a sample report](https://giocrisrai.github.io/agent-assurance/)** — generated on every push by the offline demo scan, against a recorded vulnerable agent.
+
 > Distilled from real audits of conversational agents in production. This repository publishes the **methodology and the harness**; the reports delivered to clients are confidential.
 
 ---

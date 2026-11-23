@@ -8,6 +8,8 @@
 [![Python 3.11+](https://img.shields.io/badge/python-3.11%2B-blue.svg)](https://www.python.org/)
 [![License: Apache-2.0](https://img.shields.io/badge/license-Apache--2.0-green.svg)](LICENSE)
 
+**[▶ Ver un informe de ejemplo](https://giocrisrai.github.io/agent-assurance/)** — se genera en cada push con el escaneo de demostración sin red, sobre un agente vulnerable grabado.
+
 > Destilado de auditorías reales a agentes conversacionales en producción. Este repositorio publica la **metodología y el arnés**; los informes entregados a clientes son confidenciales.
 
 ---
