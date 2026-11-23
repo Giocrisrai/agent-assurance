@@ -11,6 +11,8 @@
 
 **[▶ See a sample report](https://giocrisrai.github.io/agent-assurance/)** — generated on every push by the offline demo scan, against a recorded vulnerable agent.
 
+![Sample report: findings by severity, with reproducible evidence for each one](docs/demo.gif)
+
 > Distilled from real audits of conversational agents in production. This repository publishes the **methodology and the harness**; the reports delivered to clients are confidential.
 
 ---

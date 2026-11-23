@@ -45,7 +45,7 @@ PLANTILLA = """<!doctype html>
   th, td {{ border:1px solid var(--borde); padding:8px 10px; text-align:left; vertical-align:top; }}
   th {{ background:var(--panel); }}
   pre {{ background:#0a1020; border:1px solid var(--borde); border-radius:8px; padding:14px 16px; overflow-x:auto; font-size:.88rem; }}
-  pre code {{ background:none; border:0; padding:0; }}
+  .informe pre code {{ background:none; border:0; padding:0; }}
   footer {{ margin-top:48px; color:var(--tenue); font-size:.9rem; border-top:1px solid var(--borde); padding-top:16px; }}
 </style>
 </head>

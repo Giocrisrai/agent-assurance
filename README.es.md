@@ -10,6 +10,8 @@
 
 **[▶ Ver un informe de ejemplo](https://giocrisrai.github.io/agent-assurance/)** — se genera en cada push con el escaneo de demostración sin red, sobre un agente vulnerable grabado.
 
+![Informe de ejemplo: hallazgos por severidad, con evidencia reproducible de cada uno](docs/demo.gif)
+
 > Destilado de auditorías reales a agentes conversacionales en producción. Este repositorio publica la **metodología y el arnés**; los informes entregados a clientes son confidenciales.
 
 ---
