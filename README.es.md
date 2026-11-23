@@ -48,9 +48,9 @@ Cada sonda produce `Finding`s con severidad, impacto, corrección y **evidencia 
 ## Uso
 
 ```bash
-# Instalación desde GitHub. Este proyecto NO está en PyPI: allí el nombre `agent-assurance`
-# pertenece a un proyecto ajeno, así que `pip install agent-assurance` instala otra cosa.
-pip install git+https://github.com/Giocrisrai/agent-assurance.git
+# El paquete en PyPI se llama `llm-agent-assurance` (el nombre `agent-assurance` en PyPI
+# es de un proyecto ajeno). El comando y el import conservan el nombre corto.
+pip install llm-agent-assurance
 
 # Ver la metodología de punta a punta con un agente demo grabado (sin red):
 agent-assurance demo --lang es

@@ -3,7 +3,7 @@ requires = ["hatchling"]
 build-backend = "hatchling.build"
 
 [project]
-name = "agent-assurance"
+name = "llm-agent-assurance"
 version = "0.2.0"
 description = "Methodology and test harness for assessing the security of LLM agents and applications in production (OWASP LLM Top 10 / NIST AI RMF)."
 readme = "README.md"

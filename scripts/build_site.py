@@ -66,7 +66,8 @@ PLANTILLA = """<!doctype html>
     <p>The report below is exactly what the tool outputs. It is in English by default;
     Spanish is available with <code>agent-assurance demo --lang es</code>.</p>
     <p><a href="https://github.com/Giocrisrai/agent-assurance">Source on GitHub</a> ·
-    <code>pip install git+https://github.com/Giocrisrai/agent-assurance.git</code></p>
+    <a href="https://pypi.org/project/llm-agent-assurance/">PyPI</a> ·
+    <code>pip install llm-agent-assurance</code></p>
   </section>
   <article class="informe">
 {informe}

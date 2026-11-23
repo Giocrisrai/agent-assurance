@@ -5,6 +5,7 @@
 **A methodology and test harness for assessing the security of LLM agents and applications in production**, mapped to the [OWASP Top 10 for LLM Applications](https://genai.owasp.org/llm-top-10/) and the NIST AI RMF.
 
 [![Tests](https://github.com/Giocrisrai/agent-assurance/actions/workflows/ci.yml/badge.svg)](https://github.com/Giocrisrai/agent-assurance/actions)
+[![PyPI](https://img.shields.io/pypi/v/llm-agent-assurance.svg)](https://pypi.org/project/llm-agent-assurance/)
 [![Python 3.11+](https://img.shields.io/badge/python-3.11%2B-blue.svg)](https://www.python.org/)
 [![License: Apache-2.0](https://img.shields.io/badge/license-Apache--2.0-green.svg)](LICENSE)
 
@@ -48,9 +49,9 @@ Each probe produces `Finding`s with severity, impact, fix and **reproducible evi
 ## Usage
 
 ```bash
-# Install from GitHub. This project is NOT on PyPI: the name `agent-assurance` there
-# belongs to an unrelated project, so `pip install agent-assurance` installs something else.
-pip install git+https://github.com/Giocrisrai/agent-assurance.git
+# The PyPI package is `llm-agent-assurance` (the name `agent-assurance` on PyPI
+# belongs to an unrelated project). The command and the import keep the short name.
+pip install llm-agent-assurance
 
 # See the methodology end to end against a recorded demo agent (no network):
 agent-assurance demo            # add --lang es for the Spanish report
