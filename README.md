@@ -1,100 +1,105 @@
 # agent-assurance
 
-**Metodología y arnés de pruebas para evaluar la seguridad de agentes y aplicaciones LLM en producción**, mapeado a [OWASP Top 10 for LLM Applications](https://genai.owasp.org/llm-top-10/) y NIST AI RMF.
+**English** · [Español](README.es.md)
+
+**A methodology and test harness for assessing the security of LLM agents and applications in production**, mapped to the [OWASP Top 10 for LLM Applications](https://genai.owasp.org/llm-top-10/) and the NIST AI RMF.
 
 [![Tests](https://github.com/Giocrisrai/agent-assurance/actions/workflows/ci.yml/badge.svg)](https://github.com/Giocrisrai/agent-assurance/actions)
+[![PyPI](https://img.shields.io/pypi/v/agent-assurance.svg)](https://pypi.org/project/agent-assurance/)
 [![Python 3.11+](https://img.shields.io/badge/python-3.11%2B-blue.svg)](https://www.python.org/)
 [![License: Apache-2.0](https://img.shields.io/badge/license-Apache--2.0-green.svg)](LICENSE)
 
-> Destilado de auditorías reales a agentes conversacionales en producción. Este repositorio publica la **metodología y el arnés**; los informes entregados a clientes son confidenciales.
+> Distilled from real audits of conversational agents in production. This repository publishes the **methodology and the harness**; the reports delivered to clients are confidential.
 
 ---
 
-## Por qué existe
+## Why it exists
 
-Las empresas están desplegando agentes LLM (atención al cliente, RRHH, ventas, cotización) a gran velocidad y **casi ninguna los audita**. Los vectores no son los del pentest web clásico: son fuga de system prompt, manipulación de la integridad de los datos de negocio, agencia excesiva y consumo no acotado. `agent-assurance` sistematiza esas pruebas para que sean **repetibles, auditables y comparables entre evaluaciones**.
+Companies are shipping LLM agents (customer service, HR, sales, quoting) very fast, and **almost none of them get audited**. The attack surface is not the one a classic web pentest covers: it is system-prompt leakage, tampering with business data, excessive agency and unbounded consumption. `agent-assurance` turns those checks into tests that are **repeatable, auditable and comparable between assessments**.
 
-El principio de diseño central: **una sonda que no encuentra nada no es un fallo — es una defensa correcta observada**, y el informe la reporta como tal. Eso distingue una auditoría de una lista de quejas.
+The central design principle: **a probe that finds nothing is not a failure. It is a working defense, observed**, and the report records it as such. That is the difference between an audit and a list of complaints.
 
-## Alcance ético (invariante del proyecto)
+## Ethical scope (a project invariant)
 
-Las sondas demuestran la **existencia** de un vector, nunca lo explotan:
+Probes prove that a vector **exists**. They never exploit it:
 
-- No hay flood/DoS sostenido — solo ráfagas mínimas para observar el rate limit.
-- No se envía correo a terceros reales.
-- No se deriva el PIN del depurador ni se ejecuta código en el servidor objetivo.
-- Toda prueba respeta el límite de tasa del objetivo.
+- No sustained flooding or DoS: only minimal bursts to observe the rate limit.
+- No email is sent to real third parties.
+- The debugger PIN is never derived and no code is executed on the target server.
+- Every test respects the target's rate limit.
 
-Úsese **solo sobre sistemas propios o con autorización explícita por escrito**.
+Use it **only on systems you own or have explicit written authorization to test**.
 
-## Catálogo de sondas
+## Probe catalog
 
-| Sonda | OWASP | Qué detecta |
-|-------|-------|-------------|
-| `verbose-errors` | LLM02 | Errores del proveedor LLM devueltos crudos al cliente (filtra proveedor, política RAI, versiones). |
-| `type-confusion` | CONFIG | Entrada de tipo inesperado → excepción no controlada; en Flask `debug=True` destapa el depurador de Werkzeug (**RCE potencial**). |
-| `system-prompt-leak` | LLM07 | Extracción del system prompt por continuación de frase y pretexto de "auditoría interna". |
-| `data-integrity` | LLM01 | El agente acepta datos del usuario como fuente autoritativa (confirma precios inventados). |
-| `unbounded-input` | LLM10 | Ausencia de tope de longitud → amplificación de costo de tokens. |
+| Probe | OWASP | What it detects |
+|-------|-------|-----------------|
+| `verbose-errors` | LLM02 | Raw errors from the LLM provider returned to the client (leaks provider, content policy, versions). |
+| `type-confusion` | CONFIG | Unexpected input type → unhandled exception; with Flask `debug=True` it exposes the Werkzeug debugger (**potential RCE**). |
+| `system-prompt-leak` | LLM07 | System-prompt extraction through sentence continuation and an "internal audit" pretext. |
+| `data-integrity` | LLM01 | The agent accepts user-supplied data as authoritative (confirms made-up prices). |
+| `unbounded-input` | LLM10 | No input length cap → token-cost amplification. |
 
-Cada sonda produce `Finding`s con severidad, impacto, corrección y **evidencia reproducible** (petición/respuesta recortadas).
+Each probe produces `Finding`s with severity, impact, fix and **reproducible evidence** (trimmed request and response).
 
-## Uso
+## Usage
 
 ```bash
 pip install agent-assurance
 
-# Ver la metodología de punta a punta con un agente demo grabado (sin red):
+# See the methodology end to end against a recorded demo agent (no network):
 agent-assurance demo
 
-# Auditar un endpoint de chat real (POST JSON {"mensaje": "..."}):
-agent-assurance scan https://tu-servicio/api/chat --field mensaje
+# Audit a real chat endpoint (POST JSON {"message": "..."}):
+agent-assurance scan https://your-service/api/chat --field message
 ```
 
-Como librería:
+As a library:
 
 ```python
 from agent_assurance import scan, render_markdown, HttpTransport
 
 transport = HttpTransport(
-    url="https://tu-servicio/api/chat",
-    body_builder=lambda msg: {"mensaje": msg},
-    extract=lambda data: data.get("respuesta", ""),
+    url="https://your-service/api/chat",
+    body_builder=lambda msg: {"message": msg},
+    extract=lambda data: data.get("reply", ""),
 )
-assessment = scan(transport, target_label="Agente RRHH v2")
-print(render_markdown(assessment))          # informe Markdown listo para el cliente
-print("Severidad máxima:", assessment.max_severity.etiqueta)
+assessment = scan(transport, target_label="HR agent v2")
+print(render_markdown(assessment))          # Markdown report, ready for the client
+print("Max severity:", assessment.max_severity.etiqueta)
 ```
 
-En CI, `agent-assurance scan` devuelve código de salida `2` si hay algún hallazgo Alto o Crítico — úsalo como gate antes de promover un agente a producción.
+In CI, `agent-assurance scan` exits with code `2` when any finding is High or Critical. Use it as a gate before promoting an agent to production.
 
-## Diseño
+> **Language note.** The methodology was built auditing Spanish-speaking agents, so the probe prompts and the generated report are currently in Spanish. English prompts and reports are on the roadmap.
+
+## Design
 
 ```
-Transport (Protocol)          cómo hablarle al agente (HTTP real o grabado)
+Transport (Protocol)          how to talk to the agent (real HTTP or recorded)
    │
    ▼
-Probe.run(transport) ──► ProbeResult   findings + defensas observadas + no evaluable
+Probe.run(transport) ──► ProbeResult   findings + observed defenses + not assessable
    │
    ▼
-scan(...) ──► Assessment ──► render_markdown() ──► informe
+scan(...) ──► Assessment ──► render_markdown() ──► report
 ```
 
-- **Transporte abstracto:** las sondas son testeables sin red inyectando respuestas grabadas de agentes reales.
-- **Resiliente:** si una sonda falla (p. ej. el endpoint se cae a mitad de auditoría), se registra como "no evaluable" y la evaluación continúa — igual que en una auditoría real.
-- **El informe es el producto:** el vocabulario del código (severidades, taxonomía OWASP) es el que aparece literalmente en el entregable.
+- **Abstract transport:** probes are testable without a network by injecting recorded responses from real agents.
+- **Resilient:** if a probe fails (for example, the endpoint goes down mid-audit), it is recorded as "not assessable" and the assessment continues, as it would in a real audit.
+- **The report is the product:** the vocabulary in the code (severities, OWASP taxonomy) is the one that appears in the deliverable.
 
-## Desarrollo
+## Development
 
 ```bash
 pip install -e ".[dev]"
 pytest
 ```
 
-## Licencia
+## License
 
-Apache-2.0. La metodología es abierta; los informes de clientes, no.
+Apache-2.0. The methodology is open; client reports are not.
 
 ---
 
-*Autor: Giocrisrai Godoy Bonillo — Ingeniería de IA para sistemas en producción. Mantiene agentes LLM en producción, no solo los prueba.*
+*Author: [Giocrisrai Godoy Bonillo](https://giocrisrai.com) — AI Engineer. I audit LLM agents in production and also build and operate them. Available for LLM security assessments: contact@giocrisrai.com*
