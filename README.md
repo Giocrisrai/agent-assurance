@@ -71,7 +71,7 @@ print("Max severity:", assessment.max_severity.etiqueta)
 
 In CI, `agent-assurance scan` exits with code `2` when any finding is High or Critical. Use it as a gate before promoting an agent to production.
 
-> **Language note.** The methodology was built auditing Spanish-speaking agents, so the probe prompts and the generated report are currently in Spanish. English prompts and reports are on the roadmap.
+> **Language note.** The methodology was built auditing Spanish-speaking agents, so the probe prompts and the generated report are currently in Spanish. English prompts and reports are not available yet.
 
 ## Design
 
